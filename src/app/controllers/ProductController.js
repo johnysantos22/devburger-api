@@ -1,18 +1,39 @@
 import * as Yup from 'yup';
+import Product from '../models/Product';
 
 class ProductController {
-    async Stora(resquest, response) {
+    async Stora(request, response) {
         const schema = Yup.object({
             name: Yup.string().required(),
             price: Yup.number().required(),
-            categary: Yup.string().required(),
+            category: Yup.string().required(),
         });
+
         try {
             schema.validateSync(request.body, { abortEarly: false });
         } catch (err) {
-            return response.status(400).json({ error: err.errors });
+            return response.status(400).json({ messege: err.errors });
         }
+
+        const { filename: path } = request.file;
+        const { name, price, category } = request.body;
+
+        const product = await Product.create({
+            name,
+            price,
+            category,
+            path,
+        })
+
+        return response.status(201).json(product);
+    }
+
+    async index(request, response) {
+        const products = await Product.findAll();
+    
+        return response.json(products);
     }
 }
+
 
 export default new ProductController();

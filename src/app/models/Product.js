@@ -1,20 +1,26 @@
 import Sequelize, { Model } from 'sequelize';
 
-class Product extends  Model {
+class Product extends Model {
 
-    init(Sequelize) {
+    static init(sequelize) {
         super.init(
             {
                 name: Sequelize.STRING,
                 price: Sequelize.INTEGER,
                 category: Sequelize.STRING,
                 path: Sequelize.STRING,
-            },
+                rul: {
+                    type: Sequelize.VIRTUAL,
+                    get() {
+                        return `http://localhost:3001/product-file/${this.path}`;
+                        },
+                    }
+                },
             {
                 sequelize,
             },
         );
-    
+
     }
 }
 
