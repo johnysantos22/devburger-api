@@ -1,5 +1,7 @@
 import * as Yup from "yup";
+import jwt from "jsonwebtoken";
 import User from "../models/User";
+import authConfig from '../../config/auth';
 
 
 class SessionController {
@@ -12,7 +14,7 @@ class SessionController {
         const isValid = await schema.validate(request.body);
 
         const emailOrPasswordcorrect = () => {
-          response
+            response
                 .status(401)
                 .json({ error: 'Make sure your email or password are correct' });
         }
@@ -37,7 +39,7 @@ class SessionController {
 
         const isSamePassword = await user.checkPassword(password);
         if (!isSamePassword) {
-             return emailOrPasswordcorrect();
+            return emailOrPasswordcorrect();
         }
 
         return response.status(201).json({
@@ -45,8 +47,11 @@ class SessionController {
             name: user.name,
             email,
             admin: user.admin,
+            token: jwt.sign({ id: user.id }, authConfig.secret, {
+                expiresIn: authConfig.expiresIn,
+            }),
         });
-    }
+    }_
 }
 
 export default new SessionController();
