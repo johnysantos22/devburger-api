@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import Order from '../schema/Order';
 import Products from '../models/Product';
+import Category from '../models/Category';
 
 class OrderController {
     async store(request, response) {
@@ -28,7 +29,25 @@ class OrderController {
             where: {
                 id: productsIds,
             },
+            include: [
+                {
+                    model: Category,
+                    as: 'category',
+                    attributes: ['name'],
+                },
+            ],
         });
+
+        const formattedProducts = findProducts.map((products) =>{
+            const newProducts = {
+                id: products.id,
+                name: products.name,
+                price: products.price,
+                category: products.category.name,
+                url: products.url,
+            };
+            return newProducts;
+        })
 
         // Cria o pedido com os dados
         const orderData = {
@@ -36,7 +55,7 @@ class OrderController {
                 id: request.userId,
                 name: request.userName,
             },
-            products: findProducts,
+            products: formattedProducts,
         };
 
         // Salva o pedido no banco de dados
