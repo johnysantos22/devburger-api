@@ -26,4 +26,4 @@ routes.get('/categories', CategoryController.index);
 
 routes.post('/orders', OrderController.store); 
 
-export default routes;
+export default routes; 
